@@ -4,15 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D0D79B41-39D6-496A-B74A-C8DFDDF4D7B8}</ProjectGuid>
+    <ProjectGuid>{94993009-0DBB-4829-A408-432A9C47202B}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Kontur.GameStats.Server</RootNamespace>
-    <AssemblyName>Kontur.GameStats.Server</AssemblyName>
+    <RootNamespace>Prost</RootNamespace>
+    <AssemblyName>Prost</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -29,12 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FluentCommandLineParser, Version=1.4.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentCommandLineParser.1.4.3\lib\net35\FluentCommandLineParser.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.6.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.6.0\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -48,41 +48,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\BestPlayersCommand.cs" />
-    <Compile Include="Commands\EndpointInfoCommand.cs" />
-    <Compile Include="Commands\ICommand.cs" />
-    <Compile Include="Commands\IGet.cs" />
-    <Compile Include="Commands\IPut.cs" />
-    <Compile Include="Commands\MatchInfoCommand.cs" />
-    <Compile Include="Commands\PlayerStatsCommand.cs" />
-    <Compile Include="Commands\RecentMatchesCommand.cs" />
-    <Compile Include="Commands\ServersInfoCommand.cs" />
-    <Compile Include="Commands\ServerStatsCommand.cs" />
-    <Compile Include="Common\Common.cs" />
-    <Compile Include="Common\DescendingComparer.cs" />
-    <Compile Include="Common\Serializer.cs" />
-    <Compile Include="DataBase\DataBase.cs" />
-    <Compile Include="DataBaseController.cs" />
-    <Compile Include="DataTypes\ReportTypes\BestPlayerInfo.cs" />
-    <Compile Include="DataTypes\ReportTypes\RecentMatchInfo.cs" />
-    <Compile Include="DataTypes\MatchInfo.cs" />
-    <Compile Include="DataTypes\IDataType.cs" />
-    <Compile Include="DataTypes\MethodType.cs" />
-    <Compile Include="DataTypes\ScoreBoardUnit.cs" />
-    <Compile Include="DataTypes\Server\Server.cs" />
-    <Compile Include="DataTypes\Server\ServerInfo.cs" />
-    <Compile Include="DataTypes\StatTypes\PlayerStats.cs" />
-    <Compile Include="DataTypes\StatTypes\ServerStats.cs" />
-    <Compile Include="StatusCode.cs" />
-    <Compile Include="StatServer.cs" />
-    <Compile Include="EntryPoint.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Kontur.GameStats.Server\Kontur.GameStats.Server.csproj">
+      <Project>{D0D79B41-39D6-496A-B74A-C8DFDDF4D7B8}</Project>
+      <Name>Kontur.GameStats.Server</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
