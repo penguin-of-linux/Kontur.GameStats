@@ -2,11 +2,11 @@
 
 namespace Kontur.GameStats.Server.Commands
 {
-    public class ServerStatsCommand : ICommand, IGet
+    public class ServerStatsCommand : IGetCommand
     {
-        private readonly DataBase dataBase;
+        private readonly SimpleDataBase dataBase;
 
-        public ServerStatsCommand(DataBase dataBase)
+        public ServerStatsCommand(SimpleDataBase dataBase)
         {
             this.dataBase = dataBase;
         }

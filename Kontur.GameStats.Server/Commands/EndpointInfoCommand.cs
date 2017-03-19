@@ -1,27 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace Kontur.GameStats.Server
 {
-    public class EndpointInfoCommand : ICommand, IGet, IPut
+    public class EndpointInfoCommand : IGetCommand, IPutCommand
     {
-        private readonly DataBase dataBase;
+        private readonly SimpleDataBase dataBase;
 
-        public EndpointInfoCommand(DataBase dataBase)
+        public EndpointInfoCommand(SimpleDataBase dataBase)
         {
             this.dataBase = dataBase;
         }
         public bool IsParametersDefineCommand(string commandParameters)
         {
             var parameters = commandParameters.Split('/');
-            var result = parameters[1] == "servers" && Common.IsEndpoint(parameters[2]) && parameters[3] == "info";
 
-            return result;
+            return parameters[1] == "servers" && Common.IsEndpoint(parameters[2]) && parameters[3] == "info";
         }
 
         public Stream Get(string commandParameter)

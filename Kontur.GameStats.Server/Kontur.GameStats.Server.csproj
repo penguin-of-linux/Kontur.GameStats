@@ -51,8 +51,8 @@
     <Compile Include="Commands\BestPlayersCommand.cs" />
     <Compile Include="Commands\EndpointInfoCommand.cs" />
     <Compile Include="Commands\ICommand.cs" />
-    <Compile Include="Commands\IGet.cs" />
-    <Compile Include="Commands\IPut.cs" />
+    <Compile Include="Commands\IGetCommand.cs" />
+    <Compile Include="Commands\IPutCommand.cs" />
     <Compile Include="Commands\MatchInfoCommand.cs" />
     <Compile Include="Commands\PlayerStatsCommand.cs" />
     <Compile Include="Commands\PopularServersCommand.cs" />
@@ -62,11 +62,12 @@
     <Compile Include="Common\Common.cs" />
     <Compile Include="Common\DescendingComparer.cs" />
     <Compile Include="Common\Serializer.cs" />
-    <Compile Include="DataBase\DataBase.cs" />
+    <Compile Include="DataBase\SimpleDataBase.cs" />
     <Compile Include="DataBaseController.cs" />
+    <Compile Include="DataBase\IDataBase.cs" />
     <Compile Include="DataTypes\ReportTypes\BestPlayerInfo.cs" />
     <Compile Include="DataTypes\ReportTypes\PopularServerInfo.cs" />
-    <Compile Include="DataTypes\StatTypes\RecentMatchInfo.cs" />
+    <Compile Include="DataTypes\ReportTypes\RecentMatchInfo.cs" />
     <Compile Include="DataTypes\Match\MatchInfo.cs" />
     <Compile Include="DataTypes\IDataType.cs" />
     <Compile Include="DataTypes\MethodType.cs" />
@@ -75,6 +76,8 @@
     <Compile Include="DataTypes\Server\ServerInfo.cs" />
     <Compile Include="DataTypes\StatTypes\PlayerStats.cs" />
     <Compile Include="DataTypes\StatTypes\ServerStats.cs" />
+    <Compile Include="Exceptions\Exceptions.cs" />
+    <Compile Include="ServerOptions.cs" />
     <Compile Include="StatServer.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

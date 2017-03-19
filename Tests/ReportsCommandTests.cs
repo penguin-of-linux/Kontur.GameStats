@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Kontur.GameStats.Server;
 using NUnit.Framework;
 
@@ -11,7 +8,7 @@ namespace Tests
     [TestFixture]
     public class ReportsCommandTests
     {
-        DataBase dataBase;
+        SimpleDataBase dataBase;
         DataBaseController controller;
 
         [OneTimeSetUp]
@@ -23,7 +20,7 @@ namespace Tests
         [SetUp]
         public void SetUp()
         {
-            dataBase = new DataBase();
+            dataBase = new SimpleDataBase();
             controller = new DataBaseController(dataBase);
         }
 
@@ -86,7 +83,7 @@ namespace Tests
 
             var result = dataBase.GetBestPlayers().Select(bpi => bpi.name);
 
-            Assert.True(result.SequenceEqual(new [] {"Player4", "Player1", "Player2", "Player3"}));
+            Assert.True(result.SequenceEqual(new [] {"player4", "player1", "player2", "player3"}));
         }
 
         [Test]

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Fclp.Internals.Extensions;
 
 namespace Kontur.GameStats.Server
 {
@@ -28,44 +25,6 @@ namespace Kontur.GameStats.Server
             Matches = new Dictionary<string, MatchInfo>();
             Stats = new ServerStats();
         }
-
-        /*public ServerStats GetServerStats()
-        {
-            lock (this)
-            {
-                var tm = matches.Values.Count;
-                var populationPerMatch = matches.Values.Select(m => m.PlayersCount).ToList();
-                var mp = populationPerMatch.Max();
-                var ap = (double)populationPerMatch.Sum() / populationPerMatch.Count();
-                var tempMatches = matches;
-                var matchesPerDay = matches.Keys
-                                           .Select(dt => tempMatches
-                                               .Count(kvp => kvp.Key.Day == dt.Day))
-                                           .ToList();
-
-                var mmpd = matchesPerDay.Max();
-                var ampd = (double)matchesPerDay.Sum() / matchesPerDay.Count();
-                var t5gm = matches.Values
-                                  .Select(m => m.GameMode)
-                                  .Select(gm => new Tuple<string, int>(gm,
-                                                tempMatches.Values.Count(m => m.GameMode == gm)))
-                                  .OrderByDescending(t => t.Item2)
-                                  .Take(5)
-                                  .Select(t => t.Item1)
-                                  .ToList();
-
-                var t5m = matches.Values
-                                  .Select(m => m.Map)
-                                  .Select(map => new Tuple<string, int>(map,
-                                                tempMatches.Values.Count(m => m.Map == map)))
-                                  .OrderByDescending(t => t.Item2)
-                                  .Take(5)
-                                  .Select(t => t.Item1)
-                                  .ToList();
-                return new ServerStats(tm, mp, mmpd, ampd, ap, t5gm, t5m);
-            }
-
-        }*/
 
         public override bool Equals(object obj)
         {

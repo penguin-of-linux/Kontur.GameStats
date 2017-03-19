@@ -1,13 +1,12 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace Kontur.GameStats.Server
 {
-    public class MatchInfoCommand : ICommand, IPut, IGet
+    public class MatchInfoCommand : IPutCommand, IGetCommand
     {
-        private readonly DataBase dataBase;
+        private readonly SimpleDataBase dataBase;
 
-        public MatchInfoCommand(DataBase dataBase)
+        public MatchInfoCommand(SimpleDataBase dataBase)
         {
             this.dataBase = dataBase;
         }

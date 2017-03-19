@@ -2,7 +2,7 @@
 
 namespace Kontur.GameStats.Server
 {
-    public interface IPut
+    public interface IPutCommand : ICommand
     {
         void Put(string commandParameter, Stream dataStream);
     }

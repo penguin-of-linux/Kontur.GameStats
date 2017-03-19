@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Runtime.Serialization.Json;
 using System.Text;
-using System.Threading.Tasks;
 using Kontur.GameStats.Server.Commands;
 
 namespace Kontur.GameStats.Server
@@ -14,11 +11,11 @@ namespace Kontur.GameStats.Server
     {
         private List<ICommand> commands;
 
-        private DataBase dataBase;
+        private SimpleDataBase dataBase;
 
-        public DataBaseController(DataBase dataBase = null)
+        public DataBaseController(SimpleDataBase dataBase = null)
         {
-            this.dataBase = dataBase ?? new DataBase();
+            this.dataBase = dataBase ?? new SimpleDataBase();
             commands = new List<ICommand>()
             {
                 new EndpointInfoCommand(this.dataBase),
@@ -52,13 +49,13 @@ namespace Kontur.GameStats.Server
                 switch (method)
                 {
                     case MethodType.GET:
-                        resultStream = ((IGet)command).Get(commandParameter);
+                        resultStream = ((IGetCommand)command).Get(commandParameter);
                         return new Tuple<HttpStatusCode, Stream>(HttpStatusCode.OK, resultStream);
 
                     case MethodType.PUT:
-                        if (dataStream.Length == 0)
+                        if (dataStream == null || dataStream.Length == 0)
                             throw new ArgumentNullException(nameof(dataStream));
-                        ((IPut)command).Put(commandParameter, dataStream);
+                        ((IPutCommand)command).Put(commandParameter, dataStream);
                         return new Tuple<HttpStatusCode, Stream>(HttpStatusCode.OK, resultStream);
 
                     default:
@@ -74,10 +71,16 @@ namespace Kontur.GameStats.Server
             var message = "Unknown error";
             var status = HttpStatusCode.InternalServerError;
 
-            if (e is ArgumentException)
+            if (e is ArgumentException || e is KeyNotFoundException)
             {
                 message = "Bad request";
                 status = HttpStatusCode.BadRequest;
+            }
+
+            if (e is ServerNotFoundException)
+            {
+                message = e.Message;
+                status = HttpStatusCode.NotFound;
             }
 
             var dataStream = new MemoryStream(Encoding.UTF8.GetBytes(message));

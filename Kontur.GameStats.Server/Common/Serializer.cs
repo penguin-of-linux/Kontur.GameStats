@@ -7,33 +7,28 @@ namespace Kontur.GameStats.Server
 {
     public static class Serializer
     {
-        private static Dictionary<Type, DataContractJsonSerializer> serializers =
-            new Dictionary<Type, DataContractJsonSerializer>()
-            {
-                //{ typeof(ServerInfo), new DataContractJsonSerializer(typeof(ServerInfo)) },
-                //{ typeof(MatchInfo), new DataContractJsonSerializer(typeof(MatchInfo)) },
-                //{ typeof(Server), new DataContractJsonSerializer(typeof(Server)) }
-            };
+        private static readonly Dictionary<Type, DataContractJsonSerializer> _serializers =
+            new Dictionary<Type, DataContractJsonSerializer>();
 
         public static void SerializeObject(object obj, Stream dataStream)
         {
             var objectType = obj.GetType();
             dataStream.Position = 0;
 
-            if (!serializers.ContainsKey(objectType))
-                serializers[objectType] = new DataContractJsonSerializer(objectType);
+            if (!_serializers.ContainsKey(objectType))
+                _serializers[objectType] = new DataContractJsonSerializer(objectType);
 
-            serializers[objectType].WriteObject(dataStream, obj);
+            _serializers[objectType].WriteObject(dataStream, obj);
         }
 
         public static object DeserializeObject(Type objectType, Stream dataStream)
         {
             dataStream.Position = 0;
 
-            if (!serializers.ContainsKey(objectType))
-                serializers[objectType] = new DataContractJsonSerializer(objectType);
+            if (!_serializers.ContainsKey(objectType))
+                _serializers[objectType] = new DataContractJsonSerializer(objectType);
 
-            return serializers[objectType].ReadObject(dataStream);
+            return _serializers[objectType].ReadObject(dataStream);
         }
     }
 }

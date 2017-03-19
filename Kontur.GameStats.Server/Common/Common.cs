@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Kontur.GameStats.Server
+﻿namespace Kontur.GameStats.Server
 {
     public static class Common  // rename!!!!!!!!!!!!!!!!!
     {

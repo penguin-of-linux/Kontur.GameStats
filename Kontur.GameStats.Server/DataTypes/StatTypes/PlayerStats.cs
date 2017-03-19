@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.Security.Policy;
 
 namespace Kontur.GameStats.Server
 {
@@ -23,24 +21,16 @@ namespace Kontur.GameStats.Server
 
         public readonly string Name;
 
-        private Dictionary<string, int> serversVisits;
-        private Dictionary<string, int> gameModesPlays;
-        private Dictionary<int, int> matchesPerDay;
+        private readonly Dictionary<string, int> _serversVisits = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _gameModesPlays = new Dictionary<string, int>();
+        private readonly Dictionary<int, int> _matchesPerDay = new Dictionary<int, int>();
 
-        private double summScoreboardPercent;
-        private int kills;
-        private int deaths;
-
-        private void Init()
-        {
-            serversVisits = new Dictionary<string, int>();
-            gameModesPlays = new Dictionary<string, int>();
-            matchesPerDay = new Dictionary<int, int>();
-        }
+        private double _summScoreboardPercent;
+        private int _kills;
+        private int _deaths;
 
         public PlayerStats(string name)// : this()
         {
-            Init();
             Name = name;
         }
 
@@ -48,59 +38,92 @@ namespace Kontur.GameStats.Server
         {
             totalMatchesPlayed++;
 
-            if (Name == match.scoreBoard.First().name) totalMatchesWon++;
+            if (Name == match.Players.First()) totalMatchesWon++;
 
-            if (!serversVisits.ContainsKey(server))
-            {
-                serversVisits[server] = 0;
-                uniqueServers++;
-            }
+            ConsiderVisitedServer(server);
 
-            serversVisits[server]++;
+            ConsiderGameMode(match.gameMode);
 
-            if (favoriteServer != null)
-            {
-                if (serversVisits[favoriteServer] < serversVisits[server])
-                    favoriteServer = server;
-            }
-            else favoriteServer = server;
+            _summScoreboardPercent += GetScoreboardPercent(match);
+            averageScoreboardPercent = _summScoreboardPercent / totalMatchesPlayed;
 
-            if (!gameModesPlays.ContainsKey(match.gameMode))
-                gameModesPlays[match.gameMode] = 0;
-            gameModesPlays[match.gameMode]++;
+            ConsiderTime(time);
 
-            if (favoriteGameMode != null)
-            {
-                if (gameModesPlays[favoriteGameMode] < gameModesPlays[match.gameMode])
-                    favoriteGameMode = match.gameMode;
-            }
-            else favoriteGameMode = match.gameMode;
-
-            summScoreboardPercent += GetScoreboardPercent(match);
-            averageScoreboardPercent = summScoreboardPercent / totalMatchesPlayed;
-
-            var day = DateTime.Parse(time).Day;
-            if (!matchesPerDay.ContainsKey(day))
-                matchesPerDay[day] = 0;
-            var matchesCount = ++matchesPerDay[day];
-            if (maximumMatchesPerDay < matchesCount)
-                maximumMatchesPerDay = matchesCount;
-
-            averageMatchesPerDay = (double) totalMatchesPlayed / matchesPerDay.Keys.Count;
+            averageMatchesPerDay = (double) totalMatchesPlayed / _matchesPerDay.Keys.Count;
 
             lastMatchPlayed = time;
 
+            ComputeKillsToDeathsRatio(match);
+        }
+
+        private void ConsiderVisitedServer(string server)
+        {
+            if (!_serversVisits.ContainsKey(server))
+            {
+                _serversVisits[server] = 0;
+                uniqueServers++;
+            }
+
+            _serversVisits[server]++;
+
+            if (favoriteServer != null)
+            {
+                if (_serversVisits[favoriteServer] < _serversVisits[server])
+                    favoriteServer = server;
+            }
+            else favoriteServer = server;
+        }
+
+        private void ConsiderGameMode(string gameMode)
+        {
+            if (!_gameModesPlays.ContainsKey(gameMode))
+                _gameModesPlays[gameMode] = 0;
+            _gameModesPlays[gameMode]++;
+
+            if (favoriteGameMode != null)
+            {
+                if (_gameModesPlays[favoriteGameMode] < _gameModesPlays[gameMode])
+                    favoriteGameMode = gameMode;
+            }
+            else favoriteGameMode = gameMode;
+        }
+
+        private void ConsiderTime(string time)
+        {
+            var day = DateTime.Parse(time).Day;
+
+            if (!_matchesPerDay.ContainsKey(day))
+                _matchesPerDay[day] = 0;
+
+            var matchesCount = ++_matchesPerDay[day];
+
+            if (maximumMatchesPerDay < matchesCount)
+                maximumMatchesPerDay = matchesCount;
+        }
+
+        private void ComputeKillsToDeathsRatio(MatchInfo match)
+        {
             var name = Name;
-            kills = match.scoreBoard.Single(sbu => sbu.name == name).kills;
-            deaths = match.scoreBoard.Single(sbu => sbu.name == name).deaths;
-            killToDeathRatio = (double) kills / deaths;
+            try
+            {
+                var scoreBoardUnit = match.scoreBoard.Single(sbu => sbu.name.ToLower() == name);
+                _kills = scoreBoardUnit.kills;
+                _deaths = scoreBoardUnit.deaths;
+            }
+            catch (InvalidOperationException)
+            {
+                throw new PlayerNotFoundException($"Player '{name}' not found");
+            }
+
+            if (_deaths == 0) killToDeathRatio = int.MaxValue;
+            else killToDeathRatio = (double) _kills / _deaths;
         }
 
         private double GetScoreboardPercent(MatchInfo match)
         {
             var players = match.scoreBoard.Count;
             for (int i = 0; i < players; i++)
-                if (match.scoreBoard[i].name == Name)
+                if (match.scoreBoard[i].name.ToLower() == Name)
                     return (double)(players - i - 1) / (players - 1) * 100;
             throw new ArgumentException("MatchInfo hasn't player");
         }

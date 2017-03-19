@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Kontur.GameStats.Server;
 
 namespace Kontur.GameStats.Server
 {
@@ -17,38 +16,17 @@ namespace Kontur.GameStats.Server
         [DataMember] public List<string> top5GameModes = new List<string>();
         [DataMember] public List<string> top5Maps = new List<string>();
 
-        /*public ServerStats(int totalMatchesPlayed,
-                           int maximumPopulation,
-                           int maximumMatchesPerDay,
-                           double averageMatchesPerDay,
-                           double averagePopulation,
-                           List<string> top5GameModes,
-                           List<string> top5Maps)
-        {
-            TotalMatchesPlayed = totalMatchesPlayed;
-            MaximumPopulation = maximumPopulation;
-            MaximumMatchesPerDay = maximumMatchesPerDay;
-            AverageMatchesPerDay = averageMatchesPerDay;
-            AveragePopulation = averagePopulation;
-            Top5GameModes = top5GameModes;
-            Top5Maps = top5Maps;
-
-            matchesPerDay = new Dictionary<int, int>();
-            gameModesFrequency = new Dictionary<string, int>();
-            mapsFrequency = new Dictionary<string, int>();
-        }*/
-
-        private Dictionary<int, int> matchesPerDay;        // Maximum 14 days
-        private int totalPlayerCount;
-        private Dictionary<string, int> gameModesFrequency;
-        private Dictionary<string, int> mapsFrequency;
+        private readonly Dictionary<int, int> _matchesPerDay;        // Maximum 14 days
+        private int _totalPlayerCount;
+        private readonly Dictionary<string, int> _gameModesFrequency;
+        private readonly Dictionary<string, int> _mapsFrequency;
 
 
         public ServerStats()
         {
-            matchesPerDay = new Dictionary<int, int>();
-            gameModesFrequency = new Dictionary<string, int>();
-            mapsFrequency = new Dictionary<string, int>();
+            _matchesPerDay = new Dictionary<int, int>();
+            _gameModesFrequency = new Dictionary<string, int>();
+            _mapsFrequency = new Dictionary<string, int>();
         }
 
         public void Update(string time, MatchInfo match)
@@ -57,27 +35,27 @@ namespace Kontur.GameStats.Server
 
             var day = DateTime.Parse(time).Day;
 
-            if (!matchesPerDay.ContainsKey(day)) matchesPerDay[day] = 0;
-            if (!gameModesFrequency.ContainsKey(match.gameMode)) gameModesFrequency[match.gameMode] = 0;
-            if (!mapsFrequency.ContainsKey(match.map)) mapsFrequency[match.map] = 0;
+            if (!_matchesPerDay.ContainsKey(day)) _matchesPerDay[day] = 0;
+            if (!_gameModesFrequency.ContainsKey(match.gameMode)) _gameModesFrequency[match.gameMode] = 0;
+            if (!_mapsFrequency.ContainsKey(match.map)) _mapsFrequency[match.map] = 0;
 
-            gameModesFrequency[match.gameMode]++;
-            mapsFrequency[match.map]++;
-            var matchPerDay = ++matchesPerDay[day];
+            _gameModesFrequency[match.gameMode]++;
+            _mapsFrequency[match.map]++;
+            var matchPerDay = ++_matchesPerDay[day];
 
             if (maximumMatchesPerDay < matchPerDay)
                 maximumMatchesPerDay = matchPerDay;
 
             var playerCount = match.PlayersCount;
-            totalPlayerCount += playerCount;
+            _totalPlayerCount += playerCount;
 
             if (maximumPopulation < playerCount)
                 maximumPopulation = playerCount;
 
-            averageMatchesPerDay = (double)totalMatchesPlayed / matchesPerDay.Keys.Count;
-            averagePopulation = (double)totalPlayerCount / totalMatchesPlayed;
-            top5GameModes = TopSelector(gameModesFrequency, 5);
-            top5Maps = TopSelector(mapsFrequency, 5);
+            averageMatchesPerDay = (double)totalMatchesPlayed / _matchesPerDay.Keys.Count;
+            averagePopulation = (double)_totalPlayerCount / totalMatchesPlayed;
+            top5GameModes = TopSelector(_gameModesFrequency, 5);
+            top5Maps = TopSelector(_mapsFrequency, 5);
         }
 
         private List<string> TopSelector(Dictionary<string, int> dict, int count)

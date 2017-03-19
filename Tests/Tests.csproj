@@ -58,7 +58,6 @@
   <ItemGroup>
     <Compile Include="ClientTests.cs" />
     <Compile Include="DataBaseControllerTest.cs" />
-    <Compile Include="HardTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportsCommandTests.cs" />
     <Compile Include="StatsTest.cs" />

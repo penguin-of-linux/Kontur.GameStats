@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 
 namespace Kontur.GameStats.Server.Commands
 {
-    public class RecentMatchesCommand : ICommand, IGet
+    public class RecentMatchesCommand : IGetCommand
     {
-        private readonly DataBase dataBase;
+        private readonly SimpleDataBase dataBase;
 
-        public RecentMatchesCommand(DataBase dataBase)
+        public RecentMatchesCommand(SimpleDataBase dataBase)
         {
             this.dataBase = dataBase;
         }

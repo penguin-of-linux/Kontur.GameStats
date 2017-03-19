@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
-using NUnit;
 using NUnit.Framework;
 using Kontur.GameStats.Server;
-using Kontur.GameStats.Server.DataTypes.ReportTypes;
 
 namespace Tests
 {
     [TestFixture]
     public class DataBaseControllerTest
     {
-        DataBase dataBase;
+        SimpleDataBase dataBase;
         DataBaseController controller;
 
         [SetUp]
@@ -27,7 +22,7 @@ namespace Tests
         [OneTimeSetUp]
         public void TestInitialize()
         {
-            dataBase = new DataBase();
+            dataBase = new SimpleDataBase();
             controller = new DataBaseController(dataBase);
 
             dataBase.AddServer(new Server("test-8080", "test server", "DM", "TDM"));

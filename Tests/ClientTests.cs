@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Kontur.GameStats.Server;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace Tests
 {
@@ -42,7 +36,7 @@ namespace Tests
         }
 
         [Test]
-        public void Get_ServersInfo__ClientTest()
+        public void Get_ServersInfo_ClientTest()
         {
             AddServer_ClientTest();
 
@@ -83,9 +77,18 @@ namespace Tests
                 result.Item2.Replace("\r\n", ""));
         }
 
+        [Test]
+        public void Put_MatchToUnexistingServer_ClientTest()
+        {
+            var data = "same data";
+            var parameters = "/servers/unexisting-server/matches/2017-01-22T15:17:00Z";
+
+            Assert.Throws<WebException>(() => GetResponse(data, parameters, MethodType.GET));
+        }
+
         private Tuple<HttpStatusCode, string> GetResponse(string data, string parameters, MethodType method)
         {
-            HttpWebRequest request2 = (HttpWebRequest)WebRequest.Create("http://localhost:8080" + parameters);
+            var request2 = (HttpWebRequest)WebRequest.Create("http://localhost:8080" + parameters);
             request2.Method = method.ToString();
 
             if (method == MethodType.PUT)
@@ -96,9 +99,9 @@ namespace Tests
                 }
             }
 
-
             var result = "";
-            HttpWebResponse response2 = (HttpWebResponse)request2.GetResponse();
+
+            var response2 = (HttpWebResponse)request2.GetResponse();
             using (var stream = new StreamReader(response2.GetResponseStream()))
             {
                 result = stream.ReadToEnd();

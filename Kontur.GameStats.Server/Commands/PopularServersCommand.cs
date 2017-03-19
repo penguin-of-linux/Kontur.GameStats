@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace Kontur.GameStats.Server.Commands
 {
-    public class PopularServersCommand : ICommand, IGet
+    public class PopularServersCommand : IGetCommand
     {
-        private readonly DataBase dataBase;
+        private readonly SimpleDataBase dataBase;
 
-        public PopularServersCommand(DataBase dataBase)
+        public PopularServersCommand(SimpleDataBase dataBase)
         {
             this.dataBase = dataBase;
         }

@@ -15,7 +15,7 @@ namespace Kontur.GameStats.Server
         [DataMember] public readonly List<ScoreBoardUnit> scoreBoard;
 
         public int PlayersCount => scoreBoard?.Count ?? 0;
-        public List<string> Players => scoreBoard?.Select(sbu => sbu.name).ToList();
+        public List<string> Players => scoreBoard?.Select(x => x.name.ToLower()).ToList();
 
         public MatchInfo(string map, string gameMode, int fragLimit, 
                          int timeLimit, double timeElapsed, List<ScoreBoardUnit> scoreBoard)
