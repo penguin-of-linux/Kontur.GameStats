@@ -95,17 +95,18 @@ namespace Kontur.GameStats.Server
             // TODO: implement request handling
 
             var text = new StreamReader(listenerContext.Request.InputStream).ReadToEnd();
-            Console.WriteLine(text);
+            /*Console.WriteLine(text);
             //var headers = listenerContext.Request.Headers;
 
-            /*listenerContext.Response.StatusCode = (int)HttpStatusCode.OK;
+            listenerContext.Response.StatusCode = (int)HttpStatusCode.OK;
             using (var writer = new StreamWriter(listenerContext.Response.OutputStream))
             {
                 var req = listenerContext.Request;
                 //foreach(var header in headers)
-                writer.WriteLine($"{req.RawUrl} {req.HttpMethod} {text}");
+                writer.WriteLine("hello");
             }
             return;*/
+
             Console.WriteLine("Обработка");
             var request = listenerContext.Request;
 
@@ -114,37 +115,27 @@ namespace Kontur.GameStats.Server
 
             var stream = new MemoryStream(Encoding.Unicode.GetBytes(text));
 
+            Tuple<HttpStatusCode, Stream> result;
+
             try
             {
-                Console.WriteLine("Перед контроллером");
-                var result = controller.HandleRequest(method, commandParameter, stream);
-                Console.WriteLine("После контроллера");
-
-                var response = listenerContext.Response;
-                //response.OutputStream.Write(data, 0, data.Length);
-                Console.WriteLine("Запись");
-                using (var writer = new StreamWriter(listenerContext.Response.OutputStream))
-                {
-                    using (var reader = new StreamReader(result.Item2))
-                    {
-                        result.Item2.Position = 0;
-                        var s = reader.ReadToEnd();
-                        //var s = Encoding.Unicode.GetString(result.Item2.);
-                        writer.WriteLine(s + " END " + result.Item2.Length);
-                        Console.WriteLine($"!!!!!!!!!{s}!!!!!!");
-                    }
-
-                }
-                Console.WriteLine("Конец записи");
+                result = controller.HandleRequest(method, commandParameter, stream);
             }
             catch (Exception e)
             {
-                Console.WriteLine("Catched");
-                using (var writer = new StreamWriter(listenerContext.Response.OutputStream))
+                Console.WriteLine("Captured exception " + e);
+                result = controller.HandleException(e);
+            }
+            Console.WriteLine("After");
+            using (var writer = new StreamWriter(listenerContext.Response.OutputStream))
+            {
+                using (var reader = new StreamReader(result.Item2))
                 {
-                    writer.WriteLine("ERROR " + e.ToString());
+                    listenerContext.Response.StatusCode = (int) result.Item1;
+                    result.Item2.Position = 0;
+                    var answer = reader.ReadToEnd();
+                    writer.WriteLine("Answer: " + answer);
                 }
-                return;
             }
 
         }

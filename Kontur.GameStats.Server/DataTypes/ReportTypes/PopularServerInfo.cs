@@ -10,8 +10,8 @@ namespace Kontur.GameStats.Server.DataTypes.ReportTypes
     [DataContract]
     public struct PopularServerInfo
     {
-        [DataMember] public string Endpoint;
-        [DataMember] public string Name;
-        [DataMember] public double AverageMatchesPerDay;
+        [DataMember] public string endpoint;
+        [DataMember] public string name;
+        [DataMember] public double averageMatchesPerDay;
     }
 }

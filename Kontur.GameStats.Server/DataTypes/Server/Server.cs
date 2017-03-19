@@ -9,17 +9,12 @@ namespace Kontur.GameStats.Server
     [DataContract]
     public struct Server : IDataType
     {
-        [DataMember] public readonly string Endpoint;
-        [DataMember] public readonly ServerInfo Info;
+        [DataMember] public readonly string endpoint;
+        [DataMember] public readonly ServerInfo info;
 
-        public readonly Dictionary<DateTime, MatchInfo> Matches;
+        public readonly Dictionary<string, MatchInfo> Matches;
 
         internal ServerStats Stats;// => GetServerStats();
-
-        public Server(string endpoint, string name, List<string> gameModes) 
-            : this(endpoint, new ServerInfo(name, gameModes))
-        {
-        }
 
         public Server(string endpoint, string name, params string[] gameModes) 
             : this(endpoint, new ServerInfo(name, new List<string>(gameModes)))
@@ -28,9 +23,9 @@ namespace Kontur.GameStats.Server
 
         public Server(string endpoint, ServerInfo serverInfo)
         {
-            Endpoint = endpoint;
-            Info = serverInfo;
-            Matches = new Dictionary<DateTime, MatchInfo>();
+            this.endpoint = endpoint;
+            info = serverInfo;
+            Matches = new Dictionary<string, MatchInfo>();
             Stats = new ServerStats();
         }
 
@@ -80,10 +75,7 @@ namespace Kontur.GameStats.Server
 
         public override int GetHashCode()
         {
-            return Endpoint.GetHashCode() +
-                   Info.GetHashCode(); //+
-            //matches?.Keys.Sum(k => k.GetHashCode()) ?? 0 +
-            //matches?.Values.Sum(v => v.GetHashCode()) ?? 0;
+            return endpoint.GetHashCode() + info.GetHashCode();
         }
     }
 }

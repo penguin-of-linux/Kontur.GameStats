@@ -55,6 +55,7 @@
     <Compile Include="Commands\IPut.cs" />
     <Compile Include="Commands\MatchInfoCommand.cs" />
     <Compile Include="Commands\PlayerStatsCommand.cs" />
+    <Compile Include="Commands\PopularServersCommand.cs" />
     <Compile Include="Commands\RecentMatchesCommand.cs" />
     <Compile Include="Commands\ServersInfoCommand.cs" />
     <Compile Include="Commands\ServerStatsCommand.cs" />
@@ -64,8 +65,9 @@
     <Compile Include="DataBase\DataBase.cs" />
     <Compile Include="DataBaseController.cs" />
     <Compile Include="DataTypes\ReportTypes\BestPlayerInfo.cs" />
-    <Compile Include="DataTypes\ReportTypes\RecentMatchInfo.cs" />
-    <Compile Include="DataTypes\MatchInfo.cs" />
+    <Compile Include="DataTypes\ReportTypes\PopularServerInfo.cs" />
+    <Compile Include="DataTypes\StatTypes\RecentMatchInfo.cs" />
+    <Compile Include="DataTypes\Match\MatchInfo.cs" />
     <Compile Include="DataTypes\IDataType.cs" />
     <Compile Include="DataTypes\MethodType.cs" />
     <Compile Include="DataTypes\ScoreBoardUnit.cs" />
@@ -73,7 +75,6 @@
     <Compile Include="DataTypes\Server\ServerInfo.cs" />
     <Compile Include="DataTypes\StatTypes\PlayerStats.cs" />
     <Compile Include="DataTypes\StatTypes\ServerStats.cs" />
-    <Compile Include="StatusCode.cs" />
     <Compile Include="StatServer.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

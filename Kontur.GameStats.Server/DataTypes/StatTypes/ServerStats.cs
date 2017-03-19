@@ -9,13 +9,13 @@ namespace Kontur.GameStats.Server
     [DataContract]
     public class ServerStats
     {
-        [DataMember] public int TotalMatchesPlayed;
-        [DataMember] public int MaximumPopulation;
-        [DataMember] public int MaximumMatchesPerDay;
-        [DataMember] public double AverageMatchesPerDay;
-        [DataMember] public double AveragePopulation;
-        [DataMember] public List<string> Top5GameModes = new List<string>();
-        [DataMember] public List<string> Top5Maps = new List<string>();
+        [DataMember] public int totalMatchesPlayed;
+        [DataMember] public int maximumPopulation;
+        [DataMember] public int maximumMatchesPerDay;
+        [DataMember] public double averageMatchesPerDay;
+        [DataMember] public double averagePopulation;
+        [DataMember] public List<string> top5GameModes = new List<string>();
+        [DataMember] public List<string> top5Maps = new List<string>();
 
         /*public ServerStats(int totalMatchesPlayed,
                            int maximumPopulation,
@@ -51,33 +51,33 @@ namespace Kontur.GameStats.Server
             mapsFrequency = new Dictionary<string, int>();
         }
 
-        public void Update(DateTime time, MatchInfo match)
+        public void Update(string time, MatchInfo match)
         {
-            TotalMatchesPlayed++;
+            totalMatchesPlayed++;
 
-            var day = time.Day;
+            var day = DateTime.Parse(time).Day;
 
             if (!matchesPerDay.ContainsKey(day)) matchesPerDay[day] = 0;
-            if (!gameModesFrequency.ContainsKey(match.GameMode)) gameModesFrequency[match.GameMode] = 0;
-            if (!mapsFrequency.ContainsKey(match.Map)) mapsFrequency[match.Map] = 0;
+            if (!gameModesFrequency.ContainsKey(match.gameMode)) gameModesFrequency[match.gameMode] = 0;
+            if (!mapsFrequency.ContainsKey(match.map)) mapsFrequency[match.map] = 0;
 
-            gameModesFrequency[match.GameMode]++;
-            mapsFrequency[match.Map]++;
+            gameModesFrequency[match.gameMode]++;
+            mapsFrequency[match.map]++;
             var matchPerDay = ++matchesPerDay[day];
 
-            if (MaximumMatchesPerDay < matchPerDay)
-                MaximumMatchesPerDay = matchPerDay;
+            if (maximumMatchesPerDay < matchPerDay)
+                maximumMatchesPerDay = matchPerDay;
 
             var playerCount = match.PlayersCount;
             totalPlayerCount += playerCount;
 
-            if (MaximumPopulation < playerCount)
-                MaximumPopulation = playerCount;
+            if (maximumPopulation < playerCount)
+                maximumPopulation = playerCount;
 
-            AverageMatchesPerDay = (double)TotalMatchesPlayed / matchesPerDay.Keys.Count;
-            AveragePopulation = (double)totalPlayerCount / TotalMatchesPlayed;
-            Top5GameModes = TopSelector(gameModesFrequency, 5);
-            Top5Maps = TopSelector(mapsFrequency, 5);
+            averageMatchesPerDay = (double)totalMatchesPlayed / matchesPerDay.Keys.Count;
+            averagePopulation = (double)totalPlayerCount / totalMatchesPlayed;
+            top5GameModes = TopSelector(gameModesFrequency, 5);
+            top5Maps = TopSelector(mapsFrequency, 5);
         }
 
         private List<string> TopSelector(Dictionary<string, int> dict, int count)
@@ -91,13 +91,13 @@ namespace Kontur.GameStats.Server
 
         public override int GetHashCode()
         {
-            return TotalMatchesPlayed.GetHashCode()
-                 + MaximumMatchesPerDay.GetHashCode()
-                 + MaximumPopulation.GetHashCode()
-                 + AverageMatchesPerDay.GetHashCode()
-                 + AveragePopulation.GetHashCode()
-                 + Top5GameModes.Sum(gm => gm.GetHashCode())
-                 + Top5Maps.Sum(m => m.GetHashCode());
+            return totalMatchesPlayed.GetHashCode()
+                 + maximumMatchesPerDay.GetHashCode()
+                 + maximumPopulation.GetHashCode()
+                 + averageMatchesPerDay.GetHashCode()
+                 + averagePopulation.GetHashCode()
+                 + top5GameModes.Sum(gm => gm.GetHashCode())
+                 + top5Maps.Sum(m => m.GetHashCode());
         }
 
         public override bool Equals(object other)

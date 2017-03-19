@@ -5,6 +5,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Kontur.GameStats.Server.DataTypes.ReportTypes;
 
 
 namespace Kontur.GameStats.Server
@@ -13,23 +14,18 @@ namespace Kontur.GameStats.Server
     {
         private Dictionary<string, Server> servers;
         private Dictionary<string, PlayerStats> playersStats;
-        private SortedDictionary<DateTime, RecentMatchInfo> matches;
+        //rivate SortedDictionary<DateTime, MatchInfo> matches;
 
         public DataBase()
         {
             servers = new Dictionary<string, Server>();
             playersStats = new Dictionary<string, PlayerStats>();
-            matches = new SortedDictionary<DateTime, RecentMatchInfo>(new DescendingComparer<DateTime>());
+            //matches = new SortedDictionary<DateTime, MatchInfo>(new DescendingComparer<DateTime>());
         }
 
         public void AddServer(Server server)
         {
-            servers[server.Endpoint] = server;
-        }
-
-        public void AddServer(string endpoint, string name, List<string> gameModes)
-        {
-            AddServer(new Server(endpoint, name, gameModes));
+            servers[server.endpoint] = server;
         }
 
         public List<Server> GetAllServers()
@@ -39,7 +35,7 @@ namespace Kontur.GameStats.Server
 
         public List<MatchInfo> GetAllMatches()
         {
-            return new List<MatchInfo>(matches.Values.Select(x => x.Results));
+            return new List<MatchInfo>(servers.Values.SelectMany(s => s.Matches.Values));
         }
 
         public Server GetServer(string endpoint)
@@ -49,10 +45,10 @@ namespace Kontur.GameStats.Server
 
         public void PutMatch(string endpoint, string time, MatchInfo match)
         {
-            var dateTime = DateTime.Parse(time);
-            matches[dateTime] = new RecentMatchInfo { Server = endpoint, Timestamp = time, Results = match };  // !!!!!!!!!!!!!!!!!!!!
-            servers[endpoint].Matches[dateTime] = match;
-            GetServerStats(endpoint).Update(dateTime, match);
+            //var dateTime = DateTime.Parse(time);
+            //matches[dateTime] = match;  // !!!!!!!!!!!!!!!!!!!!
+            servers[endpoint].Matches[time] = match;
+            GetServerStats(endpoint).Update(time, match);
 
             foreach (var player in match.Players)
             {
@@ -64,11 +60,6 @@ namespace Kontur.GameStats.Server
         }
 
         public MatchInfo GetMatch(string endpoint, string time)
-        {
-            return GetMatch(endpoint, DateTime.Parse(time));
-        }
-
-        public MatchInfo GetMatch(string endpoint, DateTime time)
         {
             return servers[endpoint].Matches[time];
         }
@@ -88,7 +79,19 @@ namespace Kontur.GameStats.Server
             if (count <= 0) return new List<RecentMatchInfo>();
             if (count > 50) count = 50; // !!!
 
-            return matches.Take(count).Select(kvp => kvp.Value).ToList();
+            return servers.Values
+                .SelectMany(s => s.Matches
+                    .Select(kvp => new KeyValuePair<DateTime, RecentMatchInfo>(DateTime.Parse(kvp.Key),
+                        new RecentMatchInfo
+                        {
+                            server = s.endpoint,
+                            timestamp = kvp.Key,
+                            results = kvp.Value
+                        })))
+                .OrderByDescending(kvp => kvp.Key)
+                .Take(count)
+                .Select(kvp => kvp.Value)
+                .ToList();
         }
 
         public List<BestPlayerInfo> GetBestPlayers(int count = 5)
@@ -97,10 +100,27 @@ namespace Kontur.GameStats.Server
             if (count > 50) count = 50; // !!!
 
             return playersStats.Values
-                               .OrderByDescending(ps => ps.KillToDeathRatio)
+                               .OrderByDescending(ps => ps.killToDeathRatio)
                                .Take(count)
-                               .Select(ps => new BestPlayerInfo { Name = ps.Name, KillToDeathRatio = ps.KillToDeathRatio })
+                               .Select(ps => new BestPlayerInfo { name = ps.Name, killToDeathRatio = ps.killToDeathRatio })
                                .ToList();
+        }
+
+        public List<PopularServerInfo> GetPopularServers(int count = 5)
+        {
+            if (count <= 0) return new List<PopularServerInfo>();
+            if (count > 50) count = 50; // !!!
+
+            return servers.Values
+                          .OrderByDescending(s => s.Stats.averageMatchesPerDay)
+                          .Take(count)
+                          .Select(s => new PopularServerInfo
+                          {
+                              endpoint = s.endpoint,
+                              name = s.info.name,
+                              averageMatchesPerDay = s.Stats.averageMatchesPerDay
+                          })
+                          .ToList();
         }
     }
 }

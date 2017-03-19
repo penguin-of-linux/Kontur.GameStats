@@ -11,13 +11,13 @@ namespace Kontur.GameStats.Server
     [DataContract]
     public struct ServerInfo
     {
-        [DataMember] public readonly string Name;
-        [DataMember] public readonly List<string> GameModes;
+        [DataMember] public readonly string name;
+        [DataMember] public readonly List<string> gameModes;
 
         public ServerInfo(string name, List<string> gameModes)
         {
-            Name = name;
-            GameModes = gameModes;
+            this.name = name;
+            this.gameModes = gameModes;
         }
 
         public ServerInfo(string name, params string[] gameModes)
@@ -27,7 +27,7 @@ namespace Kontur.GameStats.Server
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode() + (GameModes?.Sum(m => m.GetHashCode()) ?? 0);
+            return name.GetHashCode() + (gameModes?.Sum(m => m.GetHashCode()) ?? 0);
         }
 
         public override bool Equals(object obj)

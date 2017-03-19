@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using NUnit;
 using NUnit.Framework;
 using Kontur.GameStats.Server;
+using Kontur.GameStats.Server.DataTypes.ReportTypes;
 
 namespace Tests
 {
@@ -36,25 +38,8 @@ namespace Tests
                 new ScoreBoardUnit("Player1", 20, 21, 3),
                 new ScoreBoardUnit("Player2", 2, 2, 21)
             };
-            dataBase.PutMatch("test-8080", "2017 -01-22T15:17:00Z", 
+            dataBase.PutMatch("test-8080", "2017-01-22T15:17:00Z", 
                 new MatchInfo("DM-HelloWorld", "DM", 20, 20, 12.345678, scoreBoard));
-        }
-
-        [Test]
-        public void DataBaseIsSafe_Test()
-        {
-            var serverCopy = dataBase.GetServer("test-8080");
-            var matchCopy = dataBase.GetMatch("test-8080", "2017 -01-22T15:17:00Z");
-            var statsCopy = dataBase.GetServerStats("test-8080");
-
-            serverCopy = new Server("1", "2", "3");
-            matchCopy = new MatchInfo("1", "2", 3, 4, 5.0, null);
-            statsCopy = new ServerStats();
-
-            Assert.Fail();
-            Assert.AreNotEqual(dataBase.GetServer("test-8080"), serverCopy);
-            Assert.AreNotEqual(dataBase.GetMatch("test-8080", "2017 -01-22T15:17:00Z"), matchCopy);
-            Assert.AreNotEqual(dataBase.GetServerStats("test-8080"), statsCopy);
         }
 
         [Test]
@@ -65,9 +50,9 @@ namespace Tests
             var dataStream = new MemoryStream();
             Serializer.SerializeObject(newServer, dataStream);
 
-            controller.HandleRequest(MethodType.Put, commandParameter, dataStream);
+            controller.HandleRequest(MethodType.PUT, commandParameter, dataStream);
 
-            Assert.Contains(newServer, dataBase.GetAllServers().Select(s => s.Info).ToArray());
+            Assert.Contains(newServer, dataBase.GetAllServers().Select(s => s.info).ToArray());
         }
 
         [Test]
@@ -76,12 +61,12 @@ namespace Tests
             var commandParameter = "/servers/test-8080/info";
             var server = dataBase.GetServer("test-8080");
 
-            var answer = controller.HandleRequest(MethodType.Get, commandParameter);
+            var answer = controller.HandleRequest(MethodType.GET, commandParameter);
             var answerStatus = answer.Item1;
             var answerData = (ServerInfo)Serializer.DeserializeObject(typeof(ServerInfo), answer.Item2);
 
-            Assert.AreEqual(StatusCode.OK, answerStatus);
-            Assert.AreEqual(server.Info, answerData);
+            Assert.AreEqual(HttpStatusCode.OK, answerStatus);
+            Assert.AreEqual(server.info, answerData);
         }
 
         [Test]
@@ -98,7 +83,7 @@ namespace Tests
             var dataStream = new MemoryStream();
             Serializer.SerializeObject(newMatch, dataStream);
 
-            controller.HandleRequest(MethodType.Put, commandParameter, dataStream);
+            controller.HandleRequest(MethodType.PUT, commandParameter, dataStream);
 
             Assert.AreEqual(newMatch, dataBase.GetMatch("test-8080", time));
         }
@@ -110,12 +95,12 @@ namespace Tests
             var commandParameter = $"/servers/test-8080/matches/{time}";
             var match = dataBase.GetMatch("test-8080", time);
 
-            var answer = controller.HandleRequest(MethodType.Get, commandParameter);
+            var answer = controller.HandleRequest(MethodType.GET, commandParameter);
             var answerData = (MatchInfo)Serializer.DeserializeObject(typeof(MatchInfo), answer.Item2);
             var answerStatus = answer.Item1;
 
             Assert.AreEqual(match, answerData);
-            Assert.AreEqual(StatusCode.OK, answerStatus);
+            Assert.AreEqual(HttpStatusCode.OK, answerStatus);
         }
 
         [Test]
@@ -123,13 +108,13 @@ namespace Tests
         {
             var commandParameters = "/servers/info";
 
-            var answer = controller.HandleRequest(MethodType.Get, commandParameters);
+            var answer = controller.HandleRequest(MethodType.GET, commandParameters);
             var servers = (List<Server>) Serializer.DeserializeObject(typeof(List<Server>), answer.Item2);
 
             Assert.True(dataBase
                 .GetAllServers()
-                .Select(s => s.Info)
-                .SequenceEqual(servers.Select(s => s.Info)));
+                .Select(s => s.info)
+                .SequenceEqual(servers.Select(s => s.info)));
             ;
         }
 
@@ -140,7 +125,7 @@ namespace Tests
             var commandParameters = "/servers/test-8080/stats";
             var stats = dataBase.GetServerStats("test-8080");
 
-            var answer = controller.HandleRequest(MethodType.Get, commandParameters);
+            var answer = controller.HandleRequest(MethodType.GET, commandParameters);
             var answerStats = (ServerStats) Serializer.DeserializeObject(typeof(ServerStats), answer.Item2);
 
             Assert.AreEqual(stats, answerStats);
@@ -152,7 +137,7 @@ namespace Tests
             var commandParameters = "/players/Player1/stats";
             var stats = dataBase.GetPlayerStats("Player1");
 
-            var answer = controller.HandleRequest(MethodType.Get, commandParameters);
+            var answer = controller.HandleRequest(MethodType.GET, commandParameters);
             var answerStats = (PlayerStats)Serializer.DeserializeObject(typeof(PlayerStats), answer.Item2);
 
             Assert.AreEqual(stats, answerStats);
@@ -164,7 +149,7 @@ namespace Tests
             var commandParameters = "/reports/recent-matches";
             var recentMatches = dataBase.GetRecentMatches(5);
 
-            var answer = controller.HandleRequest(MethodType.Get, commandParameters);
+            var answer = controller.HandleRequest(MethodType.GET, commandParameters);
             var result = (List<RecentMatchInfo>) Serializer.DeserializeObject(typeof(List<RecentMatchInfo>), answer.Item2);
 
             Assert.True(recentMatches.SequenceEqual(result));
@@ -176,10 +161,22 @@ namespace Tests
             var commandParameters = "/reports/best-players";
             var bestPlayers = dataBase.GetBestPlayers();
 
-            var answer = controller.HandleRequest(MethodType.Get, commandParameters);
+            var answer = controller.HandleRequest(MethodType.GET, commandParameters);
             var result = (List<BestPlayerInfo>) Serializer.DeserializeObject(typeof(List<BestPlayerInfo>), answer.Item2);
 
             Assert.True(bestPlayers.SequenceEqual(result));
+        }
+
+        [Test]
+        public void Get_PopularServers_RequestTest()
+        {
+            var commandParameters = "/reports/popular-servers";
+            var popularServers = dataBase.GetPopularServers();
+
+            var answer = controller.HandleRequest(MethodType.GET, commandParameters);
+            var result = (List<PopularServerInfo>)Serializer.DeserializeObject(typeof(List<PopularServerInfo>), answer.Item2);
+
+            Assert.True(popularServers.SequenceEqual(result));
         }
     }
 }

@@ -5,17 +5,17 @@ namespace Kontur.GameStats.Server
     [DataContract]
     public struct ScoreBoardUnit
     {
-        [DataMember] public readonly string Name;
-        [DataMember] public readonly int Frags;
-        [DataMember] public readonly int Kills;
-        [DataMember] public readonly int Deaths;
+        [DataMember] public readonly string name;
+        [DataMember] public readonly int frags;
+        [DataMember] public readonly int kills;
+        [DataMember] public readonly int deaths;
 
         public ScoreBoardUnit(string name, int frags, int kills, int deaths)
         {
-            Name = name;
-            Frags = frags;
-            Kills = kills;
-            Deaths = deaths;
+            this.name = name;
+            this.frags = frags;
+            this.kills = kills;
+            this.deaths = deaths;
         }
 
         public override bool Equals(object obj)
@@ -26,10 +26,10 @@ namespace Kontur.GameStats.Server
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode() +
-                   Frags +
-                   Kills +
-                   Deaths;
+            return name.GetHashCode() +
+                   frags +
+                   kills +
+                   deaths;
         }
     }
 }

@@ -27,7 +27,8 @@ namespace Kontur.GameStats.Server
                 new ServerStatsCommand(this.dataBase),
                 new PlayerStatsCommand(this.dataBase),
                 new RecentMatchesCommand(this.dataBase),
-                new BestPlayersCommand(this.dataBase)
+                new BestPlayersCommand(this.dataBase),
+                new PopularServersCommand(this.dataBase)
             };
         }
         
@@ -35,13 +36,13 @@ namespace Kontur.GameStats.Server
         {
             switch (method)
             {
-                case "GET": return MethodType.Get;
-                case "PUT": return MethodType.Put;
+                case "GET": return MethodType.GET;
+                case "PUT": return MethodType.PUT;
                 default: throw new ArgumentException("Unknown method");
             }
         }
 
-        public Tuple<StatusCode, Stream> HandleRequest(MethodType method, string commandParameter, Stream dataStream = null)
+        public Tuple<HttpStatusCode, Stream> HandleRequest(MethodType method, string commandParameter, Stream dataStream = null)
         {
             Stream resultStream = new MemoryStream();
             foreach (var command in commands)
@@ -50,21 +51,38 @@ namespace Kontur.GameStats.Server
 
                 switch (method)
                 {
-                    case MethodType.Get:
+                    case MethodType.GET:
                         resultStream = ((IGet)command).Get(commandParameter);
-                        return new Tuple<StatusCode, Stream>(StatusCode.OK, resultStream);
+                        return new Tuple<HttpStatusCode, Stream>(HttpStatusCode.OK, resultStream);
 
-                    case MethodType.Put:
-                        if (dataStream == null) ; // Обработать! (возможно, перегрузкой и проверкой на null)
-                        /*var success = */((IPut)command).Put(commandParameter, dataStream);
-                        return new Tuple<StatusCode, Stream>(StatusCode.OK, resultStream);
+                    case MethodType.PUT:
+                        if (dataStream.Length == 0)
+                            throw new ArgumentNullException(nameof(dataStream));
+                        ((IPut)command).Put(commandParameter, dataStream);
+                        return new Tuple<HttpStatusCode, Stream>(HttpStatusCode.OK, resultStream);
 
                     default:
-                        throw new Exception("Unknown method type");
+                        throw new ArgumentException("Unknown method type");
                 }
             }
 
-            throw new Exception("Unknown command type");
+            throw new ArgumentException("Unknown command type");
+        }
+
+        public Tuple<HttpStatusCode, Stream> HandleException(Exception e)
+        {
+            var message = "Unknown error";
+            var status = HttpStatusCode.InternalServerError;
+
+            if (e is ArgumentException)
+            {
+                message = "Bad request";
+                status = HttpStatusCode.BadRequest;
+            }
+
+            var dataStream = new MemoryStream(Encoding.UTF8.GetBytes(message));
+
+            return new Tuple<HttpStatusCode, Stream>(status, dataStream);
         }
     }
 }

@@ -11,8 +11,8 @@ namespace Kontur.GameStats.Server
     [DataContract]
     public struct RecentMatchInfo
     {
-        [DataMember] public string Server;
-        [DataMember] public string Timestamp;
-        [DataMember] public MatchInfo Results;
+        [DataMember] public string server;
+        [DataMember] public string timestamp;
+        [DataMember] public MatchInfo results;
     }
 }

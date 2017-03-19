@@ -10,16 +10,16 @@ namespace Kontur.GameStats.Server
     [DataContract]
     public class PlayerStats
     {
-        [DataMember] public int TotalMatchesPlayed;
-        [DataMember] public int TotalMatchesWon;
-        [DataMember] public string FavoriteServer;
-        [DataMember] public int UniqueServers;
-        [DataMember] public string FavoriteGameMode;
-        [DataMember] public double AverageScoreboardPercent;
-        [DataMember] public int MaximumMatchesPerDay;
-        [DataMember] public double AverageMatchesPerDay;
-        [DataMember] public string LastMatchPlayed;
-        [DataMember] public double KillToDeathRatio;
+        [DataMember] public int totalMatchesPlayed;
+        [DataMember] public int totalMatchesWon;
+        [DataMember] public string favoriteServer;
+        [DataMember] public int uniqueServers;
+        [DataMember] public string favoriteGameMode;
+        [DataMember] public double averageScoreboardPercent;
+        [DataMember] public int maximumMatchesPerDay;
+        [DataMember] public double averageMatchesPerDay;
+        [DataMember] public string lastMatchPlayed;
+        [DataMember] public double killToDeathRatio;
 
         public readonly string Name;
 
@@ -46,61 +46,61 @@ namespace Kontur.GameStats.Server
 
         public void Update(MatchInfo match, string server, string time)
         {
-            TotalMatchesPlayed++;
+            totalMatchesPlayed++;
 
-            if (Name == match.ScoreBoard.First().Name) TotalMatchesWon++;
+            if (Name == match.scoreBoard.First().name) totalMatchesWon++;
 
             if (!serversVisits.ContainsKey(server))
             {
                 serversVisits[server] = 0;
-                UniqueServers++;
+                uniqueServers++;
             }
 
             serversVisits[server]++;
 
-            if (FavoriteServer != null)
+            if (favoriteServer != null)
             {
-                if (serversVisits[FavoriteServer] < serversVisits[server])
-                    FavoriteServer = server;
+                if (serversVisits[favoriteServer] < serversVisits[server])
+                    favoriteServer = server;
             }
-            else FavoriteServer = server;
+            else favoriteServer = server;
 
-            if (!gameModesPlays.ContainsKey(match.GameMode))
-                gameModesPlays[match.GameMode] = 0;
-            gameModesPlays[match.GameMode]++;
+            if (!gameModesPlays.ContainsKey(match.gameMode))
+                gameModesPlays[match.gameMode] = 0;
+            gameModesPlays[match.gameMode]++;
 
-            if (FavoriteGameMode != null)
+            if (favoriteGameMode != null)
             {
-                if (gameModesPlays[FavoriteGameMode] < gameModesPlays[match.GameMode])
-                    FavoriteGameMode = match.GameMode;
+                if (gameModesPlays[favoriteGameMode] < gameModesPlays[match.gameMode])
+                    favoriteGameMode = match.gameMode;
             }
-            else FavoriteGameMode = match.GameMode;
+            else favoriteGameMode = match.gameMode;
 
             summScoreboardPercent += GetScoreboardPercent(match);
-            AverageScoreboardPercent = summScoreboardPercent / TotalMatchesPlayed;
+            averageScoreboardPercent = summScoreboardPercent / totalMatchesPlayed;
 
             var day = DateTime.Parse(time).Day;
             if (!matchesPerDay.ContainsKey(day))
                 matchesPerDay[day] = 0;
             var matchesCount = ++matchesPerDay[day];
-            if (MaximumMatchesPerDay < matchesCount)
-                MaximumMatchesPerDay = matchesCount;
+            if (maximumMatchesPerDay < matchesCount)
+                maximumMatchesPerDay = matchesCount;
 
-            AverageMatchesPerDay = (double) TotalMatchesPlayed / matchesPerDay.Keys.Count;
+            averageMatchesPerDay = (double) totalMatchesPlayed / matchesPerDay.Keys.Count;
 
-            LastMatchPlayed = time;
+            lastMatchPlayed = time;
 
             var name = Name;
-            kills = match.ScoreBoard.Single(sbu => sbu.Name == name).Kills;
-            deaths = match.ScoreBoard.Single(sbu => sbu.Name == name).Deaths;
-            KillToDeathRatio = (double) kills / deaths;
+            kills = match.scoreBoard.Single(sbu => sbu.name == name).kills;
+            deaths = match.scoreBoard.Single(sbu => sbu.name == name).deaths;
+            killToDeathRatio = (double) kills / deaths;
         }
 
         private double GetScoreboardPercent(MatchInfo match)
         {
-            var players = match.ScoreBoard.Count;
+            var players = match.scoreBoard.Count;
             for (int i = 0; i < players; i++)
-                if (match.ScoreBoard[i].Name == Name)
+                if (match.scoreBoard[i].name == Name)
                     return (double)(players - i - 1) / (players - 1) * 100;
             throw new ArgumentException("MatchInfo hasn't player");
         }
@@ -114,16 +114,16 @@ namespace Kontur.GameStats.Server
 
         public override int GetHashCode()
         {
-            return TotalMatchesPlayed.GetHashCode() + 
-                   TotalMatchesWon.GetHashCode() + 
-                   FavoriteServer.GetHashCode() + 
-                   UniqueServers.GetHashCode() + 
-                   FavoriteGameMode.GetHashCode() + 
-                   AverageScoreboardPercent.GetHashCode() + 
-                   MaximumMatchesPerDay.GetHashCode() + 
-                   AverageMatchesPerDay.GetHashCode() + 
-                   LastMatchPlayed.GetHashCode() + 
-                   KillToDeathRatio.GetHashCode();
+            return totalMatchesPlayed.GetHashCode() + 
+                   totalMatchesWon.GetHashCode() + 
+                   favoriteServer.GetHashCode() + 
+                   uniqueServers.GetHashCode() + 
+                   favoriteGameMode.GetHashCode() + 
+                   averageScoreboardPercent.GetHashCode() + 
+                   maximumMatchesPerDay.GetHashCode() + 
+                   averageMatchesPerDay.GetHashCode() + 
+                   lastMatchPlayed.GetHashCode() + 
+                   killToDeathRatio.GetHashCode();
         }
     }
 }

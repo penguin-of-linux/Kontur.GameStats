@@ -29,7 +29,7 @@ namespace Kontur.GameStats.Server
             var serverName = commandParameter.Split('/')[2];
             var server = dataBase.GetServer(serverName);
             var dataStream = new MemoryStream();
-            Serializer.SerializeObject(server.Info, dataStream);
+            Serializer.SerializeObject(server.info, dataStream);
 
             return dataStream;
         }

@@ -14,20 +14,17 @@ namespace Tests
         DataBase dataBase;
         DataBaseController controller;
 
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void TestInitialize()
         {
 
         }
 
-        [OneTimeSetUp]
-        public void TestInitialize()
+        [SetUp]
+        public void SetUp()
         {
             dataBase = new DataBase();
             controller = new DataBaseController(dataBase);
-
-            dataBase.AddServer(new Server("test1-8080", "test server", "DM"));
-            dataBase.AddServer(new Server("test2-8080", "test server", "DM"));
         }
 
         [Test]
@@ -38,7 +35,8 @@ namespace Tests
                 new ScoreBoardUnit("Player1", 20, 21, 3),
                 new ScoreBoardUnit("Player2", 2, 2, 21)
             };
-
+            dataBase.AddServer(new Server("test1-8080", "test server", "DM"));
+            dataBase.AddServer(new Server("test2-8080", "test server", "DM"));
             var match = new MatchInfo("DM-HelloWorld", "DM", 20, 20, 12.345678, scoreBoard);
 
 
@@ -55,9 +53,9 @@ namespace Tests
             var result = dataBase.GetRecentMatches();
 
             Assert.True(dataBase.GetAllServers()
-                                .Single(s => s.Endpoint == "test1-8080")
+                                .Single(s => s.endpoint == "test1-8080")
                                 .Matches.Values
-                                .SequenceEqual(result.Select(x => x.Results)));
+                                .SequenceEqual(result.Select(x => x.results)));
         }
 
         [Test]
@@ -77,15 +75,44 @@ namespace Tests
                 new ScoreBoardUnit("Player1", 10, 1, 1)
             };
 
+            dataBase.AddServer(new Server("test1-8080", "test server", "DM"));
+            dataBase.AddServer(new Server("test2-8080", "test server", "DM"));
+
             var match1 = new MatchInfo("DM-HelloWorld", "DM", 20, 20, 12.345678, scoreBoard1);
             var match2 = new MatchInfo("DM-HelloWorld", "DM", 20, 20, 12.345678, scoreBoard2);
 
             dataBase.PutMatch("test1-8080", "2017-01-22T15:17:00Z", match1);
             dataBase.PutMatch("test1-8080", "2017-01-22T15:17:00Z", match2);
 
-            var result = dataBase.GetBestPlayers().Select(bpi => bpi.Name);
+            var result = dataBase.GetBestPlayers().Select(bpi => bpi.name);
 
-            Assert.True(result.SequenceEqual(new List<string> {"Player4", "Player1", "Player2", "Player3"}));
+            Assert.True(result.SequenceEqual(new [] {"Player4", "Player1", "Player2", "Player3"}));
+        }
+
+        [Test]
+        public void Get_PopularServers_Test()
+        {
+            var emptyMatch = new MatchInfo("1", "1", 1, 1, 1, new List<ScoreBoardUnit>());
+
+            dataBase.AddServer(new Server("1-8080", "1", "DM"));
+            dataBase.AddServer(new Server("2-8080", "2", "DM"));
+            dataBase.AddServer(new Server("3-8080", "3", "DM"));
+
+            // 1-8080: 0 matches per day
+            // 2-8080: 2 matches per day
+            // 3-8080: 1 matches per day
+
+            dataBase.PutMatch("2-8080", "2017-01-01T10:17:00Z", emptyMatch);
+            dataBase.PutMatch("2-8080", "2017-01-01T10:17:00Z", emptyMatch);
+            dataBase.PutMatch("2-8080", "2017-01-30T10:17:00Z", emptyMatch);
+            dataBase.PutMatch("2-8080", "2017-01-30T10:17:00Z", emptyMatch);
+
+            dataBase.PutMatch("3-8080", "2017-01-01T15:17:00Z", emptyMatch);
+            dataBase.PutMatch("3-8080", "2017-01-30T15:17:00Z", emptyMatch);
+
+            var result = dataBase.GetPopularServers().Select(psi => psi.name).ToList();
+
+            Assert.True(result.SequenceEqual(new [] {"2", "3", "1"}));
         }
     }
 }

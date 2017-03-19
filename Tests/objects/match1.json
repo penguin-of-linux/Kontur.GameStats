@@ -1,0 +1,21 @@
+{
+    "map": "DM-HelloWorld",
+    "gameMode": "DM",
+    "fragLimit": 20,
+    "timeLimit": 20,
+    "timeElapsed": 12.345678,
+    "scoreboard": [
+        {
+            "name": "Player1",
+            "frags": 20,
+            "kills": 21,
+            "deaths": 3
+        },
+        {
+            "name": "Player2",
+            "frags": 2,
+            "kills": 2,
+            "deaths": 21
+        }
+]
+}

@@ -58,16 +58,16 @@ namespace Tests
         {
             var parameters = "/servers/test-8080/stats";
 
-            var answer = controller.HandleRequest(MethodType.Get, parameters);
+            var answer = controller.HandleRequest(MethodType.GET, parameters);
             var stats = (ServerStats) Serializer.DeserializeObject(typeof(ServerStats), answer.Item2);
 
-            Assert.AreEqual(1, stats.TotalMatchesPlayed, "TotalMatchesPlayed");
-            Assert.AreEqual(1, stats.MaximumMatchesPerDay, "MaximumMatchesPerDay");
-            Assert.AreEqual(1, stats.AverageMatchesPerDay, "AverageMatchesPerDay");
-            Assert.AreEqual(2, stats.MaximumPopulation, "MaximumPopulation");
-            Assert.AreEqual(2, stats.AveragePopulation, "AveragePopulation");
-            Assert.True(new [] {"DM"}.SequenceEqual(stats.Top5GameModes), "Top5GameModes");
-            Assert.True(new [] {"DM-HelloWorld"}.SequenceEqual(stats.Top5Maps), "Top5Maps");
+            Assert.AreEqual(1, stats.totalMatchesPlayed, "TotalMatchesPlayed");
+            Assert.AreEqual(1, stats.maximumMatchesPerDay, "MaximumMatchesPerDay");
+            Assert.AreEqual(1, stats.averageMatchesPerDay, "AverageMatchesPerDay");
+            Assert.AreEqual(2, stats.maximumPopulation, "MaximumPopulation");
+            Assert.AreEqual(2, stats.averagePopulation, "AveragePopulation");
+            Assert.True(new [] {"DM"}.SequenceEqual(stats.top5GameModes), "Top5GameModes");
+            Assert.True(new [] {"DM-HelloWorld"}.SequenceEqual(stats.top5Maps), "Top5Maps");
         }
 
         [Test]
@@ -77,16 +77,16 @@ namespace Tests
 
             var stats = dataBase.GetPlayerStats(name);
 
-            Assert.AreEqual(1, stats.AverageMatchesPerDay);
-            Assert.AreEqual(100, stats.AverageScoreboardPercent);
-            Assert.AreEqual("DM", stats.FavoriteGameMode);
-            Assert.AreEqual("test-8080", stats.FavoriteServer);
-            Assert.AreEqual((double) 21 / 3, stats.KillToDeathRatio);
-            Assert.AreEqual("2017-01-22T15:17:00Z", stats.LastMatchPlayed);
-            Assert.AreEqual(1, stats.MaximumMatchesPerDay);
-            Assert.AreEqual(1, stats.TotalMatchesPlayed);
-            Assert.AreEqual(1, stats.TotalMatchesWon);
-            Assert.AreEqual(1, stats.UniqueServers);
+            Assert.AreEqual(1, stats.averageMatchesPerDay);
+            Assert.AreEqual(100, stats.averageScoreboardPercent);
+            Assert.AreEqual("DM", stats.favoriteGameMode);
+            Assert.AreEqual("test-8080", stats.favoriteServer);
+            Assert.AreEqual((double) 21 / 3, stats.killToDeathRatio);
+            Assert.AreEqual("2017-01-22T15:17:00Z", stats.lastMatchPlayed);
+            Assert.AreEqual(1, stats.maximumMatchesPerDay);
+            Assert.AreEqual(1, stats.totalMatchesPlayed);
+            Assert.AreEqual(1, stats.totalMatchesWon);
+            Assert.AreEqual(1, stats.uniqueServers);
         }
     }
 }

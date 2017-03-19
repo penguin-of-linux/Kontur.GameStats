@@ -11,7 +11,7 @@ namespace Kontur.GameStats.Server
     [DataContract]
     public struct BestPlayerInfo
     {
-        [DataMember] public string Name;
-        [DataMember] public double KillToDeathRatio;
+        [DataMember] public string name;
+        [DataMember] public double killToDeathRatio;
     }
 }
